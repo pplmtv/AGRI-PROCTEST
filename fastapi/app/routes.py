@@ -1,30 +1,12 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-import boto3
+from fastapi import APIRouter
 from datetime import datetime
 from decimal import Decimal
+from app.models import SensorData
+from app.db import table
 
-app = FastAPI()
+router = APIRouter()
 
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI is running!"}
-
-@app.get("/ping")
-def ping():
-    return {"message": "pong"}
-
-# DynamoDB テーブル設定
-dynamodb = boto3.resource("dynamodb", region_name="ap-northeast-1")
-table = dynamodb.Table("agri-poc")
-
-# リクエストモデル
-class SensorData(BaseModel):
-    user_id: str
-    temperature: float
-    humidity: float
-
-@app.post("/write")
+@router.post("/write")
 def write_sensor_data(data: SensorData):
     try:
         response = table.put_item(
