@@ -1,6 +1,10 @@
 from fastapi import FastAPI
+from app.routes import router
 
 app = FastAPI()
+
+# ルーターを登録
+app.include_router(router)
 
 @app.get("/ping")
 def ping():
