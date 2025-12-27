@@ -6,7 +6,8 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - APP_ENV=local
+      # - APP_ENV=local
+      - APP_ENV=${APP_ENV}
       - DYNAMODB_TABLE=SensorData
       - AWS_ACCESS_KEY_ID=dummy
       - AWS_SECRET_ACCESS_KEY=dummy
@@ -14,6 +15,8 @@ services:
     depends_on:
       - dynamodb-local
       - dynamodb-init
+    env_file:
+      - .env
 
   dynamodb-local:
     image: amazon/dynamodb-local
