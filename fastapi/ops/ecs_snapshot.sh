@@ -5,6 +5,9 @@ set -a; source ../.env; set +a
 # ----------------------------
 # how to use:
 #   current directory should be agri-poctest
+#   cd fastapi
+#   chmod +x ops/ecs_snapshot.sh
+#   ops/ecs_snapshot.sh .
 # ----------------------------
 
 ############################################
@@ -15,7 +18,7 @@ CLUSTER_NAME=$CLUSTER_NAME
 SERVICE_NAME=$SERVICE_NAME
 TARGET_GROUP_ARN=$TARGET_GROUP_ARN
 
-OUTPUT_DIR="$(cd "$(dirname "$0")" && pwd)/output"
+OUTPUT_DIR="$(cd "$(dirname "$0")" && pwd)/output/ecs_snapshot"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 OUT_FILE="${OUTPUT_DIR}/ecs_snapshot_${TIMESTAMP}.txt"
 
@@ -26,7 +29,7 @@ mkdir -p "${OUTPUT_DIR}"
 ############################################
 section () {
   echo
-  echo "===== $1 ====="
+  echo "===== $1 "
 }
 
 ############################################
