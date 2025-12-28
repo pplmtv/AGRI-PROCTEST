@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ----------------------------
 # how to use:
-#   pwd     :agri-poctest
+#   current directory should be agri-poctest
 #   cd fastapi
 #   chmod +x ops/src_snapshot.sh
 #   ops/src_snapshot.sh . "py,ts,tsx" 5
