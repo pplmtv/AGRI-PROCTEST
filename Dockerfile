@@ -20,8 +20,11 @@ RUN apt-get update && apt-get install -y \
     jq \
  && rm -rf /var/lib/apt/lists/*
 
-# アプリケーションコードをコピー
+# Pythonコード
 COPY fastapi/app /app/app
+
+# HTMLテンプレート
+COPY fastapi/templates /app/templates
 
 # Uvicornを使ってFastAPIアプリを起動
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
