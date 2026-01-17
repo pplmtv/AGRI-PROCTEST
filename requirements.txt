@@ -2,3 +2,6 @@ fastapi
 uvicorn[standard]
 boto3  # DynamoDBアクセス用
 pydantic
+python-jose[cryptography]
+jinja2
+python-multipart
