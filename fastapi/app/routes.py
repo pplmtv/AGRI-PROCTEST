@@ -3,6 +3,8 @@ from datetime import datetime
 from decimal import Decimal
 from app.models import SensorData
 from app.db import table
+from fastapi import Depends
+from app.auth import get_current_user
 
 router = APIRouter()
 
@@ -20,3 +22,10 @@ def write_sensor_data(data: SensorData):
         return {"message": "データ書き込み成功", "aws_response": response}
     except Exception as e:
         return {"message": "エラー発生", "error": str(e)}
+    
+@router.get("/api/me")
+def me(user=Depends(get_current_user)):
+    return {
+        "user_id": user["sub"],
+        "role": user["role"],
+    }
