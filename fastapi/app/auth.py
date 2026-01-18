@@ -29,3 +29,37 @@ def require_login(request: Request):
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return verify_token(token)
+
+def extract_token(request: Request) -> str:
+    # ① Cookie から取得
+    token = request.cookies.get("access_token")
+    if token:
+        return token
+
+    # ② Authorization Header から取得
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        return auth_header.replace("Bearer ", "")
+
+    # ③ どちらも無い
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not authenticated",
+    )
+
+def get_current_user(request: Request):
+    token = extract_token(request)
+
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+        )
+        return payload  # sub, role, exp を含む
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    
