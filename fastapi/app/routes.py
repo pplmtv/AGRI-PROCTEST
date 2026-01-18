@@ -1,10 +1,11 @@
+# routes.py
 from fastapi import APIRouter
 from datetime import datetime
 from decimal import Decimal
 from app.models import SensorData
 from app.db import table
 from fastapi import Depends
-from app.auth import get_current_user
+from app.auth import require_login
 
 router = APIRouter()
 
@@ -24,8 +25,5 @@ def write_sensor_data(data: SensorData):
         return {"message": "エラー発生", "error": str(e)}
     
 @router.get("/api/me")
-def me(user=Depends(get_current_user)):
-    return {
-        "user_id": user["sub"],
-        "role": user["role"],
-    }
+def me(user=Depends(require_login)):
+    return user

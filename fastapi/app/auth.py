@@ -1,65 +1,82 @@
-# app/auth.py
+# auth.py
 import os
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
-from fastapi import HTTPException, status, Request
+import uuid
+from datetime import datetime, timedelta, timezone
+from typing import Optional
 
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import jwt, JWTError
+
+# ======================
+# Config
+# ======================
 SECRET_KEY = os.environ["FASTAPI_JWT_SECRET"]
 ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-def create_access_token(sub: str, role: str, minutes: int = 30):
+ISSUER = "agri-poc"
+AUDIENCE = "agri-poc-users"
+
+security = HTTPBearer(auto_error=False)
+
+# ======================
+# Token Create
+# ======================
+def create_access_token(user_id: str, role: str) -> str:
+    now = datetime.now(timezone.utc)
+
     payload = {
-        "sub": sub,
+        "iss": ISSUER,
+        "aud": AUDIENCE,
+        "sub": user_id,
         "role": role,
-        "exp": datetime.utcnow() + timedelta(minutes=minutes),
+        "iat": now,
+        "exp": now + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        "jti": str(uuid.uuid4()),
     }
+
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-def verify_token(token: str):
+# ======================
+# Token Decode
+# ======================
+def decode_token(token: str) -> dict:
     try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
-def require_login(request: Request):
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return verify_token(token)
-
-def extract_token(request: Request) -> str:
-    # ① Cookie から取得
-    token = request.cookies.get("access_token")
-    if token:
-        return token
-
-    # ② Authorization Header から取得
-    auth_header = request.headers.get("Authorization")
-    if auth_header and auth_header.startswith("Bearer "):
-        return auth_header.replace("Bearer ", "")
-
-    # ③ どちらも無い
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Not authenticated",
-    )
-
-def get_current_user(request: Request):
-    token = extract_token(request)
-
-    try:
-        payload = jwt.decode(
+        return jwt.decode(
             token,
             SECRET_KEY,
             algorithms=[ALGORITHM],
+            audience=AUDIENCE,
+            issuer=ISSUER,
         )
-        return payload  # sub, role, exp を含む
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
+            detail="Invalid or expired token",
         )
-    
+
+# ======================
+# Dependency
+# ======================
+def require_login(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> dict:
+    token: Optional[str] = None
+
+    # ① Authorization Header
+    if credentials:
+        token = credentials.credentials
+
+    # ② HttpOnly Cookie
+    if not token:
+        token = request.cookies.get("access_token")
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+
+    return decode_token(token)
