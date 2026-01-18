@@ -1,4 +1,4 @@
-# app/auth_routes.py
+# auth_routes.py
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -17,7 +17,7 @@ def login(username: str = Form(...), password: str = Form(...)):
     if username != "admin" or password != "password":
         return RedirectResponse("/login", status_code=303)
 
-    token = create_access_token(sub=username, role="admin")
+    token = create_access_token(user_id=username, role="admin")
 
     response = RedirectResponse("/admin", status_code=303)
     response.set_cookie(
