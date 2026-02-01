@@ -23,6 +23,7 @@ services:
     container_name: dynamodb-local
     ports:
       - "8002:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
 
   dynamodb-init:
     image: amazon/aws-cli
