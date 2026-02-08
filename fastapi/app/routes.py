@@ -17,7 +17,10 @@ from app.utils import utc_iso8601
 router = APIRouter()
 
 @router.post("/write")
-def write_sensor_data(data: SensorData):
+def write_sensor_data(
+    data: SensorData,
+    user=Depends(require_login),
+    ):
     try:
         ts = utc_iso8601()
         # NOTE:
@@ -26,15 +29,22 @@ def write_sensor_data(data: SensorData):
 
         response = table.put_item(
             Item={
-                "user_id": data.user_id,  # Primary Key
+                "user_id": user["sub"],  # JWTから取得
                 "timestamp": ts,   # Sort Key
                 "temperature": Decimal(str(data.temperature)),
                 "humidity": Decimal(str(data.humidity)),
             }
         )
-        return {"message": "WRITE OK", "timestamp": ts}
+        return {
+            "message": "WRITE OK", 
+            "timestamp": ts,
+            "user_id": user["sub"]
+        }
     except Exception as e:
-        return {"message": "WRITE NG", "error": str(e)}
+        return {
+            "message": "WRITE NG",
+            "error": str(e)
+        }
     
 @router.get("/api/me")
 def me(user=Depends(require_login)):

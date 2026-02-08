@@ -16,5 +16,5 @@ if APP_ENV == "local":
 else:
     dynamodb = boto3.resource("dynamodb")
 
-TABLE_NAME = os.getenv("DYNAMODB_TABLE", "SensorData")
+TABLE_NAME = os.environ["DYNAMODB_TABLE"]
 table = dynamodb.Table(TABLE_NAME)
