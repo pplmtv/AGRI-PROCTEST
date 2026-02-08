@@ -8,7 +8,7 @@ services:
     environment:
       # - APP_ENV=local
       - APP_ENV=${APP_ENV}
-      - DYNAMODB_TABLE=SensorData
+      - DYNAMODB_TABLE=agri-poc
       - AWS_ACCESS_KEY_ID=dummy
       - AWS_SECRET_ACCESS_KEY=dummy
       - AWS_DEFAULT_REGION=ap-northeast-1
