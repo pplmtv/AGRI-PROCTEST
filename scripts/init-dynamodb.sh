@@ -37,19 +37,19 @@ TABLES=$(aws dynamodb list-tables \
   --query 'TableNames[]')
 
 # -----------------------------
-# SensorData テーブルの作成
+# agri-poc テーブルの作成
 # -----------------------------
-if echo "$TABLES" | grep -q "SensorData"; then
-  echo "Table SensorData already exists."
+if echo "$TABLES" | grep -q "agri-poc"; then
+  echo "Table agri-poc already exists."
 else
-  echo "Creating table SensorData..."
+  echo "Creating table agri-poc..."
 
-  # SensorData table (PoC design)
+  # agri-poc table (PoC design)
   # - PK : user_id (logical user ID, future Cognito sub)
   # - SK : timestamp (ISO8601 UTC string)
 
   aws dynamodb create-table \
-    --table-name SensorData \
+    --table-name agri-poc \
     --attribute-definitions \
       AttributeName=user_id,AttributeType=S \
       AttributeName=timestamp,AttributeType=S \
@@ -60,5 +60,5 @@ else
     --endpoint-url http://dynamodb-local:8000 \
     --region ap-northeast-1
 
-  echo "Table SensorData created!"
+  echo "Table agri-poc created!"
 fi
