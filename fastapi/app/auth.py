@@ -3,10 +3,12 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import jwt, JWTError
+from .auth_verifier import LocalJWTVerifier
+from jose import jwt
+
+verifier = LocalJWTVerifier()
 
 # ======================
 # Config
@@ -48,19 +50,7 @@ def create_access_token(user_id: str, role: str) -> str:
 # Token Decode
 # ======================
 def decode_token(token: str) -> dict:
-    try:
-        return jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM],
-            audience=AUDIENCE,
-            issuer=ISSUER,
-        )
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token",
-        )
+    return verifier.verify(token)
 
 # ======================
 # Dependency
