@@ -1,3 +1,4 @@
+# init-dynnamodb.sh
 #!/bin/sh
 set -e
 # ↑ 途中でエラーが出たら即終了（CI / docker-compose向け安全策）
@@ -61,4 +62,37 @@ else
     --region ap-northeast-1
 
   echo "Table agri-poc created!"
+fi
+
+# -----------------------------
+# agri-poc-relationship テーブルの作成
+# -----------------------------
+if echo "$TABLES" | grep -q "agri-poc-relationship"; then
+  echo "Table agri-poc-relationship already exists."
+else
+  echo "Creating table agri-poc-relationship..."
+
+  # UserRelationship table (PoC design)
+  # - PK : family_id
+  # - SK : farmer_id
+  #
+  # Purpose:
+  #   Manage which farmer(s) a family user can access.
+  #
+  # Access pattern:
+  #   Query by family_id -> list farmer_id(s)
+
+  aws dynamodb create-table \
+    --table-name agri-poc-relationship \
+    --attribute-definitions \
+      AttributeName=family_id,AttributeType=S \
+      AttributeName=farmer_id,AttributeType=S \
+    --key-schema \
+      AttributeName=family_id,KeyType=HASH \
+      AttributeName=farmer_id,KeyType=RANGE \
+    --billing-mode PAY_PER_REQUEST \
+    --endpoint-url http://dynamodb-local:8000 \
+    --region ap-northeast-1
+
+  echo "Table agri-poc-relationship created!"
 fi

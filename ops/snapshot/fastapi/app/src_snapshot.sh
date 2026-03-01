@@ -5,9 +5,8 @@ set -euo pipefail
 # ----------------------------
 # how to use:
 #   current directory should be agri-poctest
-#   cd fastapi
-#   chmod +x ops/src_snapshot.sh
-#   ops/src_snapshot.sh . "py,ts,tsx" 5
+#   chmod +x ops/snapshot/fastapi/app/src_snapshot.sh
+#   ops/snapshot/fastapi/app/src_snapshot.sh . "py,ts,tsx,sh" 5
 # ----------------------------
 
 ROOT="${1:-.}"
@@ -17,7 +16,7 @@ MAX_DEPTH="${3:-5}"
 # ------------------------------------------------------------
 # Output settings (FIXED)
 # ------------------------------------------------------------
-OUT_DIR="ops/output/src_snapshot"
+OUT_DIR="ops/snapshot/fastapi/app/output"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 OUT_FILE="$OUT_DIR/src_snapshot_${TIMESTAMP}.txt"
 

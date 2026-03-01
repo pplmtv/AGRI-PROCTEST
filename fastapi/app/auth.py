@@ -20,6 +20,12 @@ AUDIENCE = "agri-poc-users"
 
 security = HTTPBearer(auto_error=False)
 
+ROLE_LEVEL = {
+    "family": 1,
+    "farmer": 2,
+    "admin": 3,
+}
+
 # ======================
 # Token Create
 # ======================
@@ -80,3 +86,15 @@ def require_login(
         )
 
     return decode_token(token)
+
+def require_role(required_role: str):
+    def role_checker(user=Depends(require_login)):
+        user_role = user.get("role")
+
+        if ROLE_LEVEL.get(user_role, 0) < ROLE_LEVEL.get(required_role, 0):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden"
+            )
+        return user
+    return role_checker

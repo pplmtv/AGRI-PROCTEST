@@ -16,5 +16,8 @@ if APP_ENV == "local":
 else:
     dynamodb = boto3.resource("dynamodb")
 
-TABLE_NAME = os.environ["DYNAMODB_TABLE"]
-table = dynamodb.Table(TABLE_NAME)
+SENSOR_TABLE_NAME = os.environ["DYNAMODB_TABLE"]
+REL_TABLE_NAME = os.environ["RELATIONSHIP_TABLE"]
+
+sensor_table = dynamodb.Table(SENSOR_TABLE_NAME)
+relationship_table = dynamodb.Table(REL_TABLE_NAME)
