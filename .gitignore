@@ -206,5 +206,10 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# ops
-fastapi/ops/output/
+# local-test
+local-test/fastapi/app/cookies.txt
+
+# snapshot
+ops/snapshot/fastapi/app/output/
+ops/snapshot/infra/DynamoDB/output/
+ops/snapshot/infra/ECS/output/

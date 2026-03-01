@@ -1,14 +1,14 @@
 # ecs_snapshot.sh
 #!/usr/bin/env bash
 set -euo pipefail
-set -a; source ../.env; set +a
+set -a; source .env; set +a
 
 # ----------------------------
 # how to use:
 #   current directory should be agri-poctest
 #   cd fastapi
-#   chmod +x ops/ecs_snapshot.sh
-#   ops/ecs_snapshot.sh .
+#   chmod +x ops/snapshot/infra/ECS/ecs_snapshot.sh
+#   ops/snapshot/infra/ECS/ecs_snapshot.sh .
 # ----------------------------
 
 ############################################
@@ -19,7 +19,7 @@ CLUSTER_NAME=$CLUSTER_NAME
 SERVICE_NAME=$SERVICE_NAME
 TARGET_GROUP_ARN=$TARGET_GROUP_ARN
 
-OUTPUT_DIR="$(cd "$(dirname "$0")" && pwd)/output/ecs_snapshot"
+OUTPUT_DIR="$(cd "$(dirname "$0")" && pwd)/output"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 OUT_FILE="${OUTPUT_DIR}/ecs_snapshot_${TIMESTAMP}.txt"
 

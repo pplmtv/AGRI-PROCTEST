@@ -29,9 +29,9 @@ def ping():
     return {"message": "pong"}
 
 # TODO: 本番では消す
-@app.get("/secret-check")
-def secret_check():
-    return {
-        "env": os.getenv("APP_ENV"),
-        "secret": os.getenv("FASTAPI_JWT_SECRET")
-    }
+# @app.get("/secret-check")
+# def secret_check():
+#     return {
+#         "env": os.getenv("APP_ENV"),
+#         "secret": os.getenv("FASTAPI_JWT_SECRET")
+#     }
