@@ -1,9 +1,97 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="utf-8">
+<title>Admin Dashboard</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 40px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 600px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background: #f4f4f4;
+}
+</style>
+
+</head>
+
 <body>
-  <h2>Admin</h2>
-  <p>User: {{ user.sub }}</p>
-  <p>Role: {{ user.role }}</p>
+
+<h1>Admin Dashboard</h1>
+
+<table>
+<thead>
+<tr>
+<th>Farmer</th>
+<th>Status</th>
+<th>Minutes since update</th>
+</tr>
+</thead>
+
+<tbody id="farmers">
+</tbody>
+
+</table>
+
+<script>
+
+async function loadFarmers() {
+
+  const res = await fetch("/admin/farmers")
+
+  const data = await res.json()
+
+  const tbody = document.getElementById("farmers")
+
+  data.farmers.forEach(f => {
+
+    const row = document.createElement("tr")
+
+    row.innerHTML =
+      `<td>${f.user_id}</td>
+       <td>${f.state}</td>
+       <td>${f.minutes_since_last_update}</td>`
+
+    tbody.appendChild(row)
+
+  })
+}
+
+async function refresh() {
+  const res = await fetch("/admin/farmers")
+  const data = await res.json()
+
+  const tbody = document.querySelector("tbody")
+  tbody.innerHTML = ""
+
+  data.farmers.forEach(f => {
+    const row = `
+      <tr>
+        <td>${f.user_id}</td>
+        <td>${f.state}</td>
+        <td>${f.minutes_since_last_update}</td>
+      </tr>`
+    tbody.innerHTML += row
+  })
+}
+
+setInterval(refresh, 5000)
+
+loadFarmers()
+
+</script>
+
 </body>
 </html>

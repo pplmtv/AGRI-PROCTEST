@@ -37,7 +37,17 @@ def get_accessible_farmer_ids(user: Dict) -> List[str]:
         return farmer_ids
 
     if role == "admin":
-        # シンプル版: adminは「まず自分」だけ（ここは後で拡張）
-        return [sub]
+        return list_all_farmers()
 
     return []
+
+def list_all_farmers():
+    resp = relationship_table.scan(
+        ProjectionExpression="farmer_id"
+    )
+
+    items = resp.get("Items", [])
+
+    farmers = list({i["farmer_id"] for i in items})
+
+    return farmers

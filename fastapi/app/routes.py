@@ -8,7 +8,7 @@ from app.auth import require_login,require_role
 from boto3.dynamodb.conditions import Key
 from app.utils import utc_iso8601
 from app.db import sensor_table
-from app.services.relationship_service import get_accessible_farmer_ids
+from app.services.relationship_service import get_accessible_farmer_ids, list_all_farmers
 from app.services.status_service import get_user_status
 
 # NOTE:
@@ -78,3 +78,23 @@ def me(user=Depends(require_login)):
 @router.get("/users/me/status")
 def get_my_status(user=Depends(require_login)):
     return get_user_status(user)
+
+@router.get("/admin/farmers")
+def list_farmers_status(
+    user=Depends(require_role("admin"))
+):
+    farmers = list_all_farmers()
+
+    results = []
+
+    for farmer_id in farmers:
+        farmer_user = {
+            "sub": farmer_id,
+            "role": "farmer"
+        }
+
+        status = get_user_status(farmer_user)
+
+        results.append(status)
+
+    return {"farmers": results}
