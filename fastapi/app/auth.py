@@ -3,10 +3,29 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status, APIRouter
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.responses import RedirectResponse
 from .auth_verifier import LocalJWTVerifier
 from jose import jwt
+from authlib.integrations.starlette_client import OAuth
+from dotenv import load_dotenv
+
+load_dotenv()
+
+router = APIRouter()
+
+oauth = OAuth()
+
+oauth.register(
+    name="cognito",
+    client_id=os.getenv("COGNITO_CLIENT_ID"),
+    client_secret=os.getenv("COGNITO_CLIENT_SECRET"),
+    server_metadata_url=f"https://cognito-idp.{os.getenv('COGNITO_REGION')}.amazonaws.com/{os.getenv('COGNITO_USER_POOL_ID')}/.well-known/openid-configuration",
+    client_kwargs={
+        "scope": "openid email profile",
+    },
+)
 
 verifier = LocalJWTVerifier()
 

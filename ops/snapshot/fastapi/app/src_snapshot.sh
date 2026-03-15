@@ -6,7 +6,7 @@ set -euo pipefail
 # how to use:
 #   current directory should be agri-poctest
 #   chmod +x ops/snapshot/fastapi/app/src_snapshot.sh
-#   ops/snapshot/fastapi/app/src_snapshot.sh . "py,ts,tsx,sh" 5
+#   ops/snapshot/fastapi/app/src_snapshot.sh . "py,ts,tsx,sh,html" 5
 # ----------------------------
 
 ROOT="${1:-.}"
