@@ -5,12 +5,18 @@ from fastapi import FastAPI
 from app.routes import router as api_router
 from app.auth_routes import router as auth_router
 from app.auth import register_oauth
+from starlette.middleware.sessions import SessionMiddleware
 
 # logger 設定（uvicorn / ECS / CloudWatch 想定）
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("FASTAPI_JWT_SECRET")
+)
 
 # Startup log
 @app.on_event("startup")

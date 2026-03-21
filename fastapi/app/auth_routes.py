@@ -78,7 +78,11 @@ async def login(request: Request):
 @router.get("/auth/callback")
 async def auth_callback(request: Request):
 
-    token = await oauth.cognito.authorize_access_token(request)
+    try:
+        token = await oauth.cognito.authorize_access_token(request)
+    except Exception:
+        raise HTTPException(status_code=401, detail="OAuth failed")
+    
     userinfo = token.get("userinfo") or token["id_token_claims"]
     sub = userinfo["sub"]
     groups = userinfo.get("cognito:groups", [])
@@ -102,7 +106,7 @@ async def auth_callback(request: Request):
         value=jwt_token,
         httponly=True,
         samesite="lax",
-        secure=True,
+        secure = (APP_ENV != "local"),
         max_age=1800,
         path="/",
     )
@@ -123,7 +127,9 @@ def logout():
 
     logout_url = f"{domain}/logout"
 
-    return RedirectResponse(logout_url + params)
+    response = RedirectResponse(logout_url + params)
+    response.delete_cookie("access_token")
+    return response
 
 @router.get("/admin", response_class=HTMLResponse)
 def admin_page(
