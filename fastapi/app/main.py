@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI
 from app.routes import router as api_router
 from app.auth_routes import router as auth_router
+from app.auth import register_oauth
 
 # logger 設定（uvicorn / ECS / CloudWatch 想定）
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +14,8 @@ app = FastAPI()
 
 # Startup log
 @app.on_event("startup")
-async def startup_log():
+async def startup_event():
+    register_oauth()
     logger.info("=== Application startup ===")
     logger.info(f"APP_ENV        = {os.getenv('APP_ENV')}")
     logger.info(f"AWS_REGION     = {os.getenv('AWS_REGION')}")

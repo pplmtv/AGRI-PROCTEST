@@ -4,7 +4,9 @@ import os
 from jose import jwt, JWTError
 from fastapi import HTTPException, status
 
-SECRET_KEY = os.environ["FASTAPI_JWT_SECRET"]
+SECRET_KEY = os.getenv("FASTAPI_JWT_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("JWT secret not set")
 ALGORITHM = "HS256"
 ISSUER = "agri-poc"
 AUDIENCE = "agri-poc-users"
