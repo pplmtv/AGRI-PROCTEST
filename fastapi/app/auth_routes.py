@@ -68,11 +68,15 @@ async def login(request: Request):
             {"request": request}
         )
 
+    # redirect_uri = os.getenv("COGNITO_REDIRECT_URI")
     redirect_uri = os.getenv("COGNITO_REDIRECT_URI")
+
+    if not redirect_uri:
+        raise RuntimeError("COGNITO_REDIRECT_URI not set")
 
     return await oauth.cognito.authorize_redirect(
         request,
-        redirect_uri
+        redirect_uri=redirect_uri
     )
 
 @router.get("/auth/callback")
