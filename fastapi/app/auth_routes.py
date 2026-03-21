@@ -114,12 +114,14 @@ def logout():
 
     domain = os.getenv("COGNITO_DOMAIN")
 
-    logout_url = f"{domain}/logout"
+    logout_uri = os.getenv("COGNITO_LOGOUT_URI")
 
     params = (
         f"?client_id={os.getenv('COGNITO_CLIENT_ID')}"
         f"&logout_uri={logout_uri}"
     )
+
+    logout_url = f"{domain}/logout"
 
     return RedirectResponse(logout_url + params)
 

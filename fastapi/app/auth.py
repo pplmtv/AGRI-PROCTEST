@@ -11,28 +11,28 @@ from jose import jwt
 from authlib.integrations.starlette_client import OAuth
 from dotenv import load_dotenv
 
-load_dotenv()
-
-router = APIRouter()
+if os.getenv("APP_ENV") == "local":
+    load_dotenv()
 
 oauth = OAuth()
 
-oauth.register(
-    name="cognito",
-    client_id=os.getenv("COGNITO_CLIENT_ID"),
-    client_secret=os.getenv("COGNITO_CLIENT_SECRET"),
-    server_metadata_url=f"https://cognito-idp.{os.getenv('COGNITO_REGION')}.amazonaws.com/{os.getenv('COGNITO_USER_POOL_ID')}/.well-known/openid-configuration",
-    client_kwargs={
-        "scope": "openid email profile",
-    },
-)
+def register_oauth():
+    oauth.register(
+        name="cognito",
+        client_id=os.getenv("COGNITO_CLIENT_ID"),
+        client_secret=os.getenv("COGNITO_CLIENT_SECRET"),
+        server_metadata_url=f"https://cognito-idp.{os.getenv('COGNITO_REGION')}.amazonaws.com/{os.getenv('COGNITO_USER_POOL_ID')}/.well-known/openid-configuration"
+    )
+
 
 verifier = LocalJWTVerifier()
 
 # ======================
 # Config
 # ======================
-SECRET_KEY = os.environ["FASTAPI_JWT_SECRET"]
+SECRET_KEY = os.getenv("FASTAPI_JWT_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("JWT secret not set")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
