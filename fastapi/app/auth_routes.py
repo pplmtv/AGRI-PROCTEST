@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from app.auth import create_access_token, require_login, require_role, oauth
 from fastapi import HTTPException
+from jose import jwt
 
 APP_ENV = os.getenv("APP_ENV", "local")
 
@@ -68,7 +69,6 @@ async def login(request: Request):
             {"request": request}
         )
 
-    # redirect_uri = os.getenv("COGNITO_REDIRECT_URI")
     redirect_uri = os.getenv("COGNITO_REDIRECT_URI")
 
     if not redirect_uri:
@@ -82,14 +82,27 @@ async def login(request: Request):
 @router.get("/auth/callback")
 async def auth_callback(request: Request):
 
+    print("SESSION:", request.session)
+
     try:
         token = await oauth.cognito.authorize_access_token(request)
-    except Exception:
+    except Exception as e:
+        print("OAuth error:", e)
         raise HTTPException(status_code=401, detail="OAuth failed")
     
-    userinfo = token.get("userinfo") or token["id_token_claims"]
+    userinfo = token.get("userinfo")
+
+    if not userinfo:
+        id_token = token["id_token"]
+        userinfo = jwt.get_unverified_claims(id_token)
+
+    print("userinfo:", userinfo)
+
     sub = userinfo["sub"]
     groups = userinfo.get("cognito:groups", [])
+
+    if not sub:
+        raise HTTPException(status_code=500, detail="sub not found")
 
     if "admin" in groups:
         role = "admin"
@@ -103,7 +116,7 @@ async def auth_callback(request: Request):
         role=role,
     )
 
-    response = RedirectResponse("/admin")
+    response = RedirectResponse("/admin", status_code=303)
 
     response.set_cookie(
         key="access_token",
