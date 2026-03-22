@@ -15,7 +15,9 @@ app = FastAPI()
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("FASTAPI_JWT_SECRET")
+    secret_key=os.getenv("FASTAPI_JWT_SECRET"),
+    https_only=True,
+    same_site="none",
 )
 
 # Startup log
