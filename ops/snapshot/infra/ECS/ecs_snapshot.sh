@@ -6,7 +6,6 @@ set -a; source .env; set +a
 # ----------------------------
 # how to use:
 #   current directory should be agri-poctest
-#   cd fastapi
 #   chmod +x ops/snapshot/infra/ECS/ecs_snapshot.sh
 #   ops/snapshot/infra/ECS/ecs_snapshot.sh .
 # ----------------------------
