@@ -26,6 +26,7 @@ async def startup_event():
     logger.info(f"APP_ENV        = {os.getenv('APP_ENV')}")
     logger.info(f"AWS_REGION     = {os.getenv('AWS_REGION')}")
     logger.info(f"DYNAMODB_TABLE = {os.getenv('DYNAMODB_TABLE')}")
+    logger.info(f"DYNARELATIONSHIP_TABLE = {os.getenv('RELATIONSHIP_TABLE')}")
 
 # ルーターを登録
 app.include_router(api_router)
@@ -42,3 +43,9 @@ def ping():
 #         "env": os.getenv("APP_ENV"),
 #         "secret": os.getenv("FASTAPI_JWT_SECRET")
 #     }
+
+@app.get("/debug")
+def debug():
+    return {
+        "redirect_uri": os.getenv("COGNITO_REDIRECT_URI")
+    }

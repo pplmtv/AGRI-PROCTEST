@@ -213,3 +213,4 @@ local-test/fastapi/app/cookies.txt
 ops/snapshot/fastapi/app/output/
 ops/snapshot/infra/DynamoDB/output/
 ops/snapshot/infra/ECS/output/
+ops/snapshot/infra/Edge/output/
