@@ -1,5 +1,4 @@
 # status_service.py
-
 from boto3.dynamodb.conditions import Key
 from app.db import sensor_table
 from datetime import datetime, timezone
