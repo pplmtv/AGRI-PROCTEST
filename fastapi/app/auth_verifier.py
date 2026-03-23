@@ -1,5 +1,4 @@
 # auth_verifier.py
-
 import os
 from jose import jwt, JWTError
 from fastapi import HTTPException, status

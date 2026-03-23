@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from app.auth import create_access_token, require_login, require_role, oauth
 from fastapi import HTTPException
 from jose import jwt
+from app.services.user_service import get_user, create_user
 
 APP_ENV = os.getenv("APP_ENV", "local")
 
@@ -82,8 +83,6 @@ async def login(request: Request):
 @router.get("/auth/callback")
 async def auth_callback(request: Request):
 
-    print("SESSION:", request.session)
-
     try:
         token = await oauth.cognito.authorize_access_token(request)
     except Exception as e:
@@ -96,25 +95,41 @@ async def auth_callback(request: Request):
         id_token = token["id_token"]
         userinfo = jwt.get_unverified_claims(id_token)
 
-    print("userinfo:", userinfo)
-
     sub = userinfo["sub"]
     groups = userinfo.get("cognito:groups", [])
+    email = userinfo.get("email", "")
 
-    if not sub:
-        raise HTTPException(status_code=500, detail="sub not found")
+    user = get_user(sub)
 
-    if "admin" in groups:
-        role = "admin"
-    elif "farmer" in groups:
-        role = "farmer"
-    else:
-        role = "family"
+    if not user:
+        # 初回ログイン → 自動登録
+        user = create_user(
+            user_id=sub,
+            email=email,
+            role="family"  # デフォルト
+        )
+
+    role = user["role"]
 
     jwt_token = create_access_token(
         user_id=sub,
         role=role,
     )
+
+    # if not sub:
+    #     raise HTTPException(status_code=500, detail="sub not found")
+
+    # if "admin" in groups:
+    #     role = "admin"
+    # elif "farmer" in groups:
+    #     role = "farmer"
+    # else:
+    #     role = "family"
+
+    # jwt_token = create_access_token(
+    #     user_id=sub,
+    #     role=role,
+    # )
 
     response = RedirectResponse("/admin", status_code=303)
 
